@@ -48,9 +48,9 @@ globalThis.addEventListener("mousemove", (ev) => {
 globalThis.addEventListener("deviceorientation", (ev) => {
   camera.rotation.set(
     degreesToRadians(ev.beta ?? 0),
+    degreesToRadians(ev.gamma ?? 0),
     degreesToRadians(ev.alpha ?? 0),
-    degreesToRadians(-(ev.gamma ?? 0)),
-    "YZX",
+    "YXZ",
   );
   camera.updateMatrixWorld();
   draw();
