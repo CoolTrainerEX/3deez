@@ -45,17 +45,12 @@ globalThis.addEventListener("mousemove", (ev) => {
   draw();
 });
 
-globalThis.addEventListener(
-  "click",
-  () =>
-    globalThis.addEventListener("deviceorientation", (ev) => {
-      camera.rotation.set(
-        degreesToRadians(ev.alpha ?? 0),
-        degreesToRadians(ev.beta ?? 0),
-        degreesToRadians(ev.gamma ?? 0),
-      );
-      camera.updateMatrixWorld();
-      draw();
-    }),
-  { once: true },
-);
+globalThis.addEventListener("deviceorientation", (ev) => {
+  camera.rotation.set(
+    degreesToRadians(ev.alpha ?? 0),
+    degreesToRadians(ev.beta ?? 0),
+    degreesToRadians(ev.gamma ?? 0),
+  );
+  camera.updateMatrixWorld();
+  draw();
+});
