@@ -38,20 +38,18 @@ function draw() {
 
 draw();
 
-document.addEventListener("mousemove", (ev) => {
+globalThis.addEventListener("mousemove", (ev) => {
   camera.rotateX(ev.movementY * -speed);
   camera.rotateY(ev.movementX * -speed);
   camera.updateMatrixWorld();
   draw();
 });
 
-document.addEventListener("deviceorientation", (ev) => {
-  const do_ev = ev as DeviceOrientationEvent;
-
+globalThis.addEventListener("deviceorientation", (ev) => {
   camera.rotation.set(
-    degreesToRadians(do_ev.alpha ?? 0),
-    degreesToRadians(do_ev.beta ?? 0),
-    degreesToRadians(do_ev.gamma ?? 0),
+    degreesToRadians(ev.alpha ?? 0),
+    degreesToRadians(ev.beta ?? 0),
+    degreesToRadians(ev.gamma ?? 0),
   );
   camera.updateMatrixWorld();
   draw();
