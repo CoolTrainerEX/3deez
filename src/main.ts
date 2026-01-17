@@ -1,6 +1,7 @@
 import "./style.css";
 import cat from "./cat.webp";
 import { PerspectiveCamera, Vector3 } from "three";
+import { degreesToRadians } from "./util.ts";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const width = canvas.width = globalThis.innerWidth,
@@ -40,6 +41,18 @@ draw();
 document.addEventListener("mousemove", (ev) => {
   camera.rotateX(ev.movementY * -speed);
   camera.rotateY(ev.movementX * -speed);
+  camera.updateMatrixWorld();
+  draw();
+});
+
+document.addEventListener("deviceorientation", (ev) => {
+  const do_ev = ev as DeviceOrientationEvent;
+
+  camera.rotation.set(
+    degreesToRadians(do_ev.alpha ?? 0),
+    degreesToRadians(do_ev.beta ?? 0),
+    degreesToRadians(do_ev.gamma ?? 0),
+  );
   camera.updateMatrixWorld();
   draw();
 });
