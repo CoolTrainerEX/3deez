@@ -50,7 +50,6 @@ globalThis.addEventListener("deviceorientation", (ev) => {
     degreesToRadians(ev.beta ?? 0),
     degreesToRadians(ev.gamma ?? 0),
     degreesToRadians(ev.alpha ?? 0),
-    "YXZ",
   );
   camera.updateMatrixWorld();
   draw();
