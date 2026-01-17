@@ -1,11 +1,11 @@
 import "./style.css";
 import cat from "./cat.webp";
-import { PerspectiveCamera, Vector3 } from "three";
+import { Euler, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { degreesToRadians } from "./util.ts";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const width = canvas.width = globalThis.innerWidth,
-  height = canvas.height = globalThis.innerHeight,
+const width = canvas.width = innerWidth,
+  height = canvas.height = innerHeight,
   speed = 1e-3;
 const ctx = canvas.getContext("2d")!;
 
@@ -36,21 +36,30 @@ function draw() {
   }
 }
 
-draw();
+requestAnimationFrame(draw);
 
-globalThis.addEventListener("mousemove", (ev) => {
+addEventListener("mousemove", (ev) => {
   camera.rotateX(ev.movementY * -speed);
   camera.rotateY(ev.movementX * -speed);
   camera.updateMatrixWorld();
-  draw();
+  requestAnimationFrame(draw);
 });
 
-globalThis.addEventListener("deviceorientation", (ev) => {
-  camera.rotation.set(
+const deviceEuler = new Euler();
+const deviceQuaternion = new Quaternion();
+const worldTransform = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
+
+addEventListener("deviceorientation", (ev) => {
+  deviceEuler.set(
     degreesToRadians(ev.beta ?? 0),
-    degreesToRadians(ev.gamma ?? 0),
     degreesToRadians(ev.alpha ?? 0),
+    -degreesToRadians(ev.gamma ?? 0),
+    "YXZ",
   );
+
+  deviceQuaternion.setFromEuler(deviceEuler);
+  deviceQuaternion.multiply(worldTransform);
+  camera.quaternion.copy(deviceQuaternion);
   camera.updateMatrixWorld();
-  draw();
+  requestAnimationFrame(draw);
 });
