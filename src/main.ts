@@ -47,6 +47,7 @@ addEventListener("mousemove", (ev) => {
 
 const deviceEuler = new Euler();
 const deviceQuaternion = new Quaternion();
+const screenTransform = new Quaternion();
 const worldTransform = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
 addEventListener("deviceorientation", (ev) => {
@@ -58,6 +59,13 @@ addEventListener("deviceorientation", (ev) => {
   );
 
   deviceQuaternion.setFromEuler(deviceEuler);
+
+  screenTransform.setFromAxisAngle(
+    new Vector3(0, 0, 1),
+    -degreesToRadians(screen.orientation.angle ?? 0),
+  );
+
+  deviceQuaternion.multiply(screenTransform);
   deviceQuaternion.multiply(worldTransform);
   camera.quaternion.copy(deviceQuaternion);
   camera.updateMatrixWorld();
