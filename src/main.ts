@@ -1,15 +1,19 @@
 import "./style.css";
 import {
   Color,
+  Euler,
   Mesh,
   MeshBasicMaterial,
   PerspectiveCamera,
+  Quaternion,
   Scene,
   SphereGeometry,
   Vector3,
   WebGLRenderer,
 } from "three";
+import { degreesToRadians } from "./util.ts";
 
+const speed = 1e-3;
 const scene = new Scene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer(
@@ -34,8 +38,6 @@ for (const star of stars) {
   scene.add(star);
 }
 
-camera.position.z = 5;
-
 renderer.setAnimationLoop(() => {
   if (
     renderer.domElement.width !== renderer.domElement.clientWidth ||
@@ -51,7 +53,6 @@ renderer.setAnimationLoop(() => {
     camera.updateProjectionMatrix();
   }
 
-  camera.translateZ(-0.001);
   renderer.render(scene, camera);
 });
 
@@ -59,7 +60,6 @@ addEventListener("mousemove", (ev) => {
   camera.rotateX(ev.movementY * -speed);
   camera.rotateY(ev.movementX * -speed);
   camera.updateMatrixWorld();
-  requestAnimationFrame(draw);
 });
 
 const deviceEuler = new Euler();
@@ -86,5 +86,4 @@ addEventListener("deviceorientation", (ev) => {
   deviceQuaternion.multiply(worldTransform);
   camera.quaternion.copy(deviceQuaternion);
   camera.updateMatrixWorld();
-  requestAnimationFrame(draw);
 });
