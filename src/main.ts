@@ -33,6 +33,7 @@ const stars = Array.from({ length: 100 }, () => {
 for (const star of stars) {
   scene.add(star);
 }
+
 camera.position.z = 5;
 
 renderer.setAnimationLoop(() => {
@@ -52,4 +53,38 @@ renderer.setAnimationLoop(() => {
 
   camera.translateZ(-0.001);
   renderer.render(scene, camera);
+});
+
+addEventListener("mousemove", (ev) => {
+  camera.rotateX(ev.movementY * -speed);
+  camera.rotateY(ev.movementX * -speed);
+  camera.updateMatrixWorld();
+  requestAnimationFrame(draw);
+});
+
+const deviceEuler = new Euler();
+const deviceQuaternion = new Quaternion();
+const screenTransform = new Quaternion();
+const worldTransform = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
+
+addEventListener("deviceorientation", (ev) => {
+  deviceEuler.set(
+    degreesToRadians(ev.beta ?? 0),
+    degreesToRadians(ev.alpha ?? 0),
+    -degreesToRadians(ev.gamma ?? 0),
+    "YXZ",
+  );
+
+  deviceQuaternion.setFromEuler(deviceEuler);
+
+  screenTransform.setFromAxisAngle(
+    new Vector3(0, 0, 1),
+    -degreesToRadians(screen.orientation.angle ?? 0),
+  );
+
+  deviceQuaternion.multiply(screenTransform);
+  deviceQuaternion.multiply(worldTransform);
+  camera.quaternion.copy(deviceQuaternion);
+  camera.updateMatrixWorld();
+  requestAnimationFrame(draw);
 });
