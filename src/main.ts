@@ -3,7 +3,7 @@ import cat from "./cat.webp";
 import { Euler, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { degreesToRadians } from "./util.ts";
 
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+const canvas = document.querySelector("canvas")!;
 const width = canvas.width = innerWidth,
   height = canvas.height = innerHeight,
   speed = 1e-3;
