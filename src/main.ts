@@ -1,11 +1,10 @@
 import "./style.css";
-import cat from "./cat.webp";
+import war from "./war.svg?raw";
 import { Euler, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { degreesToRadians } from "./util.ts";
 
 const speed = 1e-3;
-const canvas = document.querySelector("canvas")!;
-const ctx = canvas.getContext("2d")!;
+const svg = document.querySelector("svg")!;
 
 const camera = new PerspectiveCamera();
 const points = Array.from(
@@ -13,35 +12,33 @@ const points = Array.from(
   () => (new Vector3()).random().subScalar(0.5).multiplyScalar(10),
 );
 
-const img = new Image();
+const warSVG = (new DOMParser()).parseFromString(war, "image/svg+xml")
+  .documentElement;
 
-img.src = cat;
+warSVG.setAttribute("width", String(100));
 
 function draw() {
   if (
-    canvas.width !== canvas.clientWidth ||
-    canvas.height !== canvas.clientHeight
+    Number(svg.getAttribute("width")) !== svg.clientWidth ||
+    Number(svg.getAttribute("height")) !== svg.clientHeight
   ) {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    camera.aspect = canvas.clientWidth /
-      canvas.clientHeight;
+    svg.setAttribute("width", String(svg.clientWidth));
+    svg.setAttribute("height", String(svg.clientHeight));
+    camera.aspect = svg.clientWidth /
+      svg.clientHeight;
 
     camera.updateProjectionMatrix();
   }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  svg.innerHTML = "";
 
   for (const point of points.map((value) => value.clone().project(camera))) {
     // Check if valid render or invalid matrix calculation.
     if (point.z >= -1 && point.z <= 1) {
-      ctx.drawImage(
-        img,
-        (point.x + 1) / 2 * canvas.width,
-        (-point.y + 1) / 2 * canvas.height,
-        100,
-        100,
-      );
+      const warSVGCopy = warSVG.cloneNode(true) as SVGSVGElement;
+      warSVGCopy.setAttribute("x", String(point.x));
+      warSVGCopy.setAttribute("y", String(point.y));
+      svg.appendChild(warSVGCopy);
     }
   }
 }
