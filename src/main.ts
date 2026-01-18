@@ -3,13 +3,11 @@ import cat from "./cat.webp";
 import { Euler, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { degreesToRadians } from "./util.ts";
 
+const speed = 1e-3;
 const canvas = document.querySelector("canvas")!;
-const width = canvas.width = innerWidth,
-  height = canvas.height = innerHeight,
-  speed = 1e-3;
 const ctx = canvas.getContext("2d")!;
 
-const camera = new PerspectiveCamera(undefined, width / height);
+const camera = new PerspectiveCamera();
 const points = Array.from(
   { length: 100 },
   () => (new Vector3()).random().subScalar(0.5).multiplyScalar(10),
@@ -20,15 +18,27 @@ const img = new Image();
 img.src = cat;
 
 function draw() {
-  ctx.clearRect(0, 0, width, height);
+  if (
+    canvas.width !== canvas.clientWidth ||
+    canvas.height !== canvas.clientHeight
+  ) {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    camera.aspect = canvas.clientWidth /
+      canvas.clientHeight;
+
+    camera.updateProjectionMatrix();
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (const point of points.map((value) => value.clone().project(camera))) {
     // Check if valid render or invalid matrix calculation.
     if (point.z >= -1 && point.z <= 1) {
       ctx.drawImage(
         img,
-        (point.x + 1) / 2 * width,
-        (-point.y + 1) / 2 * height,
+        (point.x + 1) / 2 * canvas.width,
+        (-point.y + 1) / 2 * canvas.height,
         100,
         100,
       );
