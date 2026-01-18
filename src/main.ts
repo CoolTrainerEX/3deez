@@ -36,8 +36,14 @@ function draw() {
     // Check if valid render or invalid matrix calculation.
     if (point.z >= -1 && point.z <= 1) {
       const warSVGCopy = warSVG.cloneNode(true) as SVGSVGElement;
-      warSVGCopy.setAttribute("x", String(point.x));
-      warSVGCopy.setAttribute("y", String(point.y));
+      warSVGCopy.setAttribute(
+        "x",
+        String((point.x + 1) / 2 * Number(svg.getAttribute("width"))),
+      );
+      warSVGCopy.setAttribute(
+        "y",
+        String((-point.y + 1) / 2 * Number(svg.getAttribute("height"))),
+      );
       svg.appendChild(warSVGCopy);
     }
   }
