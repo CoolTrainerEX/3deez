@@ -1,3 +1,4 @@
+import "./style.css";
 import {
   Color,
   Mesh,
@@ -10,14 +11,12 @@ import {
 } from "three";
 
 const scene = new Scene();
-const camera = new PerspectiveCamera(undefined, innerWidth / innerHeight);
+const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer(
-  /*{
-  canvas: document.getElementById("c") as HTMLCanvasElement,
-}*/
+  {
+    canvas: document.querySelector("canvas")!,
+  },
 );
-
-renderer.setSize(innerWidth, innerHeight);
 
 const starMesh = new Mesh(
   new SphereGeometry(0.01),
@@ -37,10 +36,20 @@ for (const star of stars) {
 camera.position.z = 5;
 
 renderer.setAnimationLoop(() => {
-  const canvas = renderer.domElement;
+  if (
+    renderer.domElement.width !== renderer.domElement.clientWidth ||
+    renderer.domElement.height !== renderer.domElement.clientHeight
+  ) {
+    renderer.setSize(
+      renderer.domElement.clientWidth,
+      renderer.domElement.clientHeight,
+      false,
+    );
+    camera.aspect = renderer.domElement.clientWidth /
+      renderer.domElement.clientHeight;
+    camera.updateProjectionMatrix();
+  }
 
-  camera.aspect = canvas.clientWidth / canvas.clientHeight;
-  camera.updateProjectionMatrix();
   camera.translateZ(-0.001);
   renderer.render(scene, camera);
 });
