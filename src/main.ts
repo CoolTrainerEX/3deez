@@ -60,6 +60,9 @@ const deviceQuaternion = new Quaternion();
 const screenTransform = new Quaternion();
 const worldTransform = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
+// deno-lint-ignore no-explicit-any
+(DeviceOrientationEvent as any).requestPermission();
+
 addEventListener("deviceorientation", (ev) => {
   deviceEuler.set(
     degreesToRadians(ev.beta ?? 0),
@@ -80,4 +83,12 @@ addEventListener("deviceorientation", (ev) => {
   camera.quaternion.copy(deviceQuaternion);
   camera.updateMatrixWorld();
   requestAnimationFrame(draw);
+});
+
+const card = document.getElementsByClassName("card")[0] as HTMLDivElement;
+
+card.addEventListener("mousemove", (ev) => {
+  card.style.transform = `rotateY(${
+    (ev.offsetX / card.clientWidth - 0.5) * 2
+  }rad) rotateX(${(ev.offsetY / card.clientHeight - 0.5) * 2}rad)`;
 });

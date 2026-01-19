@@ -7,10 +7,11 @@ canvas {
     z-index: -999;
 }
 
-div.container {
+div.card {
     width: 25vw;
     margin: 25vh auto;
     background-color: blue;
     color: wheat;
     padding: 10px;
+    box-shadow: 10px 10px 10px  black;
 }
