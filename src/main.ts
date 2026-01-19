@@ -3,7 +3,7 @@ import war from "./war.svg?raw";
 import { Euler, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { degreesToRadians } from "./util.ts";
 
-const speed = 1e-3;
+const speed = 1e-3, size = 1e4;
 const svg = document.querySelector("svg")!;
 
 const camera = new PerspectiveCamera();
@@ -14,8 +14,6 @@ const points = Array.from(
 
 const warSVG = (new DOMParser()).parseFromString(war, "image/svg+xml")
   .documentElement;
-
-warSVG.setAttribute("width", String(100));
 
 function draw() {
   if (
@@ -36,14 +34,22 @@ function draw() {
     // Check if valid render or invalid matrix calculation.
     if (point.z >= -1 && point.z <= 1) {
       const warSVGCopy = warSVG.cloneNode(true) as SVGSVGElement;
+
       warSVGCopy.setAttribute(
         "x",
         String((point.x + 1) / 2 * Number(svg.getAttribute("width"))),
       );
+
       warSVGCopy.setAttribute(
         "y",
         String((-point.y + 1) / 2 * Number(svg.getAttribute("height"))),
       );
+
+      warSVGCopy.setAttribute(
+        "width",
+        String((-point.z + 1) / 2 * size),
+      );
+
       svg.appendChild(warSVGCopy);
     }
   }
