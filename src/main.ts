@@ -67,9 +67,6 @@ const deviceQuaternion = new Quaternion();
 const screenTransform = new Quaternion();
 const worldTransform = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
-// deno-lint-ignore no-explicit-any
-(DeviceOrientationEvent as any).requestPermission();
-
 addEventListener("deviceorientation", (ev) => {
   deviceEuler.set(
     degreesToRadians(ev.beta ?? 0),
