@@ -61,7 +61,10 @@ const screenTransform = new Quaternion();
 const worldTransform = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
 // deno-lint-ignore no-explicit-any
-(DeviceOrientationEvent as any).requestPermission();
+if (typeof (DeviceOrientationEvent as any).requestPermission === "function") {
+  // deno-lint-ignore no-explicit-any
+  (DeviceOrientationEvent as any).requestPermission();
+}
 
 addEventListener("deviceorientation", (ev) => {
   deviceEuler.set(
@@ -89,6 +92,7 @@ const card = document.getElementsByClassName("card")[0] as HTMLDivElement;
 
 card.addEventListener("mousemove", (ev) => {
   card.style.transform = `rotateY(${
-    (ev.offsetX / card.clientWidth - 0.5) * 2
-  }rad) rotateX(${(ev.offsetY / card.clientHeight - 0.5) * 2}rad)`;
+    (ev.offsetX / card.clientWidth * 2 -
+      1) * 0.5
+  }rad) rotateX(${(ev.offsetY / card.clientHeight * 2 - 1) * 0.5}rad)`;
 });
