@@ -90,13 +90,11 @@ addEventListener("deviceorientation", (ev) => {
 const card = document.querySelector(".card") as HTMLDivElement;
 
 function rotateCard() {
-  const delta = new Euler().setFromQuaternion(
-    destRotation.clone().invert().multiply(camera.quaternion),
-    "YXZ",
-  );
-
-  card.style.transform = ` rotateX(${delta.x * Math.PI}rad) rotateY(${
-    -delta.y * Math.PI
+  card.style.transform = `rotateY(${
+    -new Euler().setFromQuaternion(
+      destRotation.clone().invert().multiply(camera.quaternion),
+      "YXZ",
+    ).y * Math.PI
   }rad)`;
   requestAnimationFrame(rotateCard);
 }
