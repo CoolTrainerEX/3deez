@@ -3,7 +3,7 @@ import cat from "./cat.webp";
 import { Euler, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { degreesToRadians } from "./util.ts";
 
-const speed = 1e-1, size = 1e3, sensitivity = 1e-3;
+const speed = 100000, size = 1e3, sensitivity = 1e-3;
 const canvas = document.querySelector("canvas")!;
 const ctx = canvas.getContext("2d")!;
 
@@ -53,22 +53,26 @@ function draw() {
 
 requestAnimationFrame(draw);
 
-const mouseEuler = new Euler();
-const mouseQuaternion = new Quaternion();
-
 addEventListener("mousemove", (ev) => {
-  mouseEuler.set(-ev.movementY * sensitivity, -ev.movementX * sensitivity, 0);
-  mouseQuaternion.setFromEuler(mouseEuler);
-  destQuaternion.multiply(mouseQuaternion);
+  destQuaternion.multiply(new Quaternion().setFromEuler(
+    new Euler().set(
+      -ev.movementY * sensitivity,
+      -ev.movementX * sensitivity,
+      0,
+    ),
+  ));
 });
-
-const worldTransform = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
 // deno-lint-ignore no-explicit-any
 if (typeof (DeviceOrientationEvent as any).requestPermission === "function") {
   // deno-lint-ignore no-explicit-any
   (DeviceOrientationEvent as any).requestPermission();
 }
+
+const worldTransform = new Quaternion().setFromAxisAngle(
+  new Vector3(1, 0, 0),
+  -Math.PI / 2,
+);
 
 addEventListener("deviceorientation", (ev) => {
   destQuaternion.setFromEuler(
@@ -79,11 +83,6 @@ addEventListener("deviceorientation", (ev) => {
       "YXZ",
     ),
   );
-
-  destQuaternion.multiply(new Quaternion().setFromAxisAngle(
-    new Vector3(0, 0, 1),
-    -degreesToRadians(screen.orientation.angle ?? 0),
-  ));
 
   destQuaternion.multiply(worldTransform);
 });
