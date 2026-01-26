@@ -7,11 +7,16 @@ canvas {
     z-index: -999;
 }
 
-div.card {
-    width: 25vw;
+.card {
+    width: 50vw;
     margin: 25vh auto;
-    background-color: blue;
-    color: wheat;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
     padding: 10px;
-    box-shadow: 10px 10px 10px black;
+    backdrop-filter: blur(10px);
+}
+
+div.card > * {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    text-align: justify;
 }
