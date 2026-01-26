@@ -3,14 +3,15 @@ import cat from "./cat.webp";
 import { Euler, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { degreesToRadians } from "./util.ts";
 
-const speed = 1e-3, size = 1e3;
+const speed = 1e-1, size = 1e3, sensitivity = 1e-3;
 const canvas = document.querySelector("canvas")!;
 const ctx = canvas.getContext("2d")!;
 
 const camera = new PerspectiveCamera();
+const destQuaternion = new Quaternion();
 const points = Array.from(
   { length: 100 },
-  () => (new Vector3()).random().subScalar(0.5).multiplyScalar(10),
+  () => new Vector3().random().subScalar(0.5).multiplyScalar(10),
 );
 
 const img = new Image();
@@ -31,6 +32,8 @@ function draw() {
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  camera.quaternion.slerp(destQuaternion, speed);
+  camera.updateMatrixWorld();
 
   for (const point of points.map((value) => value.clone().project(camera))) {
     // Check if valid render or invalid matrix calculation.
@@ -44,20 +47,21 @@ function draw() {
       );
     }
   }
+
+  requestAnimationFrame(draw);
 }
 
 requestAnimationFrame(draw);
 
+const mouseEuler = new Euler();
+const mouseQuaternion = new Quaternion();
+
 addEventListener("mousemove", (ev) => {
-  camera.rotateX(ev.movementY * -speed);
-  camera.rotateY(ev.movementX * -speed);
-  camera.updateMatrixWorld();
-  requestAnimationFrame(draw);
+  mouseEuler.set(-ev.movementY * sensitivity, -ev.movementX * sensitivity, 0);
+  mouseQuaternion.setFromEuler(mouseEuler);
+  destQuaternion.multiply(mouseQuaternion);
 });
 
-const deviceEuler = new Euler();
-const deviceQuaternion = new Quaternion();
-const screenTransform = new Quaternion();
 const worldTransform = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
 // deno-lint-ignore no-explicit-any
@@ -67,32 +71,28 @@ if (typeof (DeviceOrientationEvent as any).requestPermission === "function") {
 }
 
 addEventListener("deviceorientation", (ev) => {
-  deviceEuler.set(
-    degreesToRadians(ev.beta ?? 0),
-    degreesToRadians(ev.alpha ?? 0),
-    -degreesToRadians(ev.gamma ?? 0),
-    "YXZ",
+  destQuaternion.setFromEuler(
+    new Euler(
+      degreesToRadians(ev.beta ?? 0),
+      degreesToRadians(ev.alpha ?? 0),
+      -degreesToRadians(ev.gamma ?? 0),
+      "YXZ",
+    ),
   );
 
-  deviceQuaternion.setFromEuler(deviceEuler);
-
-  screenTransform.setFromAxisAngle(
+  destQuaternion.multiply(new Quaternion().setFromAxisAngle(
     new Vector3(0, 0, 1),
     -degreesToRadians(screen.orientation.angle ?? 0),
-  );
+  ));
 
-  deviceQuaternion.multiply(screenTransform);
-  deviceQuaternion.multiply(worldTransform);
-  camera.quaternion.copy(deviceQuaternion);
-  camera.updateMatrixWorld();
-  requestAnimationFrame(draw);
+  destQuaternion.multiply(worldTransform);
 });
 
-const card = document.getElementsByClassName("card")[0] as HTMLDivElement;
+const card = document.querySelector(".card") as HTMLDivElement;
 
 card.addEventListener("mousemove", (ev) => {
   card.style.transform = `rotateY(${
     (ev.offsetX / card.clientWidth * 2 -
       1) * 0.5
-  }rad) rotateX(${(ev.offsetY / card.clientHeight * 2 - 1) * 0.5}rad)`;
+  }rad)`;
 });
